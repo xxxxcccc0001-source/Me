@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sigma Pepe - Offline Standalone (index-1.html)</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @keyframes pulseGlow {
+      0%, 100% { opacity: 0.8; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.04); }
+    }
+  </style>
+</head>
+<body class="bg-black text-white antialiased min-h-screen selection:bg-amber-400 selection:text-black">
+  <div id="app" class="max-w-xl mx-auto px-4 py-6 pb-24 space-y-4">
+    <!-- Header -->
+    <header class="text-center pt-2 pb-1">
+      <div class="text-4xl select-none">🐸</div>
+      <h1 class="text-3xl font-black tracking-widest text-white mt-1">SIGMA PEPE</h1>
+      <p class="text-[11px] font-bold tracking-widest text-amber-400 uppercase mt-0.5">
+        ⚡ STANDALONE EDITION • INDEX-1.HTML ⚡
+      </p>
+    </header>
+
+    <!-- 12:00 AM Midnight Ceremony Banner / Countdown Banner -->
+    <div id="midnight-banner-container"></div>
+
+    <!-- Active Challenge Card -->
+    <div class="p-5 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-3">
+      <div class="flex items-center justify-between text-xs text-neutral-400">
+        <span class="px-2 py-0.5 rounded-full bg-neutral-800 text-amber-300 font-mono text-[10px]">
+          #01 TODAY'S QUESTION
+        </span>
+        <span>Expires at 12:00 AM</span>
+      </div>
+      <h2 class="text-lg font-black text-white leading-snug" id="challenge-text">
+        "When the whole world doubts your vision, what is your ultimate Sigma move?"
+      </h2>
+      <div class="pt-2">
+        <textarea
+          id="answer-input"
+          rows="2"
+          placeholder="Type your sharpest Sigma response..."
+          class="w-full bg-neutral-950 border border-neutral-800 rounded-xl p-3 text-xs text-white outline-none focus:border-amber-400"
+        ></textarea>
+        <button
+          onclick="submitAnswer()"
+          class="w-full mt-2 py-2.5 bg-white hover:bg-neutral-200 text-black font-black rounded-xl text-xs uppercase tracking-wider transition cursor-pointer"
+        >
+          Post Answer (+10 Pts)
+        </button>
+      </div>
+    </div>
+
+    <!-- Arena Answers Feed -->
+    <div class="space-y-3">
+      <h3 class="text-xs font-black uppercase tracking-wider text-neutral-400">
+        Live Community Answers
+      </h3>
+      <div id="answers-container" class="space-y-3"></div>
+    </div>
+
+    <!-- Owner Control Section -->
+    <div class="p-4 rounded-2xl bg-neutral-900/90 border border-amber-500/40 space-y-3">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <span class="text-amber-400 text-lg">👑</span>
+          <span class="text-xs font-black text-white uppercase tracking-wider">Owner Command</span>
+        </div>
+        <span class="text-[10px] text-amber-300 font-mono">yachinhussain6@gmail.com</span>
+      </div>
+      <p class="text-xs text-neutral-400 leading-relaxed">
+        You are authenticated with full Master Owner permissions in this index-1.html file.
+      </p>
+      <div class="flex gap-2">
+        <button
+          onclick="openCeremony()"
+          class="flex-1 py-2 bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black text-xs rounded-xl shadow cursor-pointer"
+        >
+          🌙 Launch 12:00 AM Ceremony
+        </button>
+        <button
+          onclick="boostFirstAnswer()"
+          class="flex-1 py-2 bg-neutral-800 hover:bg-neutral-700 text-amber-300 font-black text-xs rounded-xl cursor-pointer"
+        >
+          ⚡ Boost Answer (+100)
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 12:00 AM Midnight Ceremony Modal Overlay -->
+  <div id="ceremony-modal" class="fixed inset-0 z-50 hidden bg-black select-none flex items-center justify-center overflow-hidden" style="background: radial-gradient(circle at 50% 45%, #151515, #000000 75%);">
+    <!-- Top Controls -->
+    <div class="absolute top-4 left-4 right-4 z-40 flex items-center justify-between">
+      <button onclick="playCeremonySequence()" class="px-3 py-1.5 rounded-full bg-neutral-900 border border-neutral-700 text-xs font-bold text-amber-400 cursor-pointer">
+        🔄 Replay
+      </button>
+      <button onclick="closeCeremony()" class="p-2 rounded-full bg-neutral-900 border border-neutral-700 text-white font-bold cursor-pointer">
+        ✕
+      </button>
+    </div>
+
+    <!-- Header -->
+    <div class="absolute top-8 left-1/2 -translate-x-1/2 text-center z-30 pointer-events-none">
+      <div class="text-xs font-bold text-neutral-400 tracking-wider">🌙 12:00 AM 🌙</div>
+      <div class="text-xl md:text-2xl font-black text-amber-400 tracking-widest mt-1 drop-shadow-[0_0_15px_rgba(251,191,36,0.5)]">
+        ⚡ RESULT TIME ⚡
+      </div>
+    </div>
+
+    <!-- Stage Arena -->
+    <div class="relative w-full h-full flex items-center justify-center">
+      <!-- The Gate -->
+      <div id="gate" class="absolute w-[240px] md:w-[260px] h-[340px] md:h-[370px] -translate-y-8" style="border: 4px solid #777; border-bottom: none; border-radius: 130px 130px 0 0; box-shadow: 0 0 45px rgba(255,255,255,0.15);">
+        <div id="door-left" class="absolute top-0 left-0 w-1/2 h-full bg-[#080808] border-3 border-[#444] origin-left transition-transform duration-[1500ms]" style="border-radius: 125px 0 0 0;"></div>
+        <div id="door-right" class="absolute top-0 right-0 w-1/2 h-full bg-[#080808] border-3 border-[#444] origin-right transition-transform duration-[1500ms]" style="border-radius: 0 125px 0 0;"></div>
+      </div>
+
+      <!-- Portal Glow -->
+      <div id="portal-glow" class="absolute w-[170px] md:w-[185px] h-[250px] md:h-[270px] -translate-y-8 rounded-t-[100px] opacity-0 scale-95 transition-all duration-[1200ms] pointer-events-none" style="background: radial-gradient(circle, #fff, #777 18%, #222 48%, #000 75%);"></div>
+
+      <!-- Demon Character -->
+      <img id="demon-img" src="https://i.ibb.co/prnXzb0F/Fs-Z7-EXg-AAy-EW0.jpg" alt="Demon" class="absolute z-10 w-[260px] md:w-[290px] max-h-[350px] object-contain opacity-0 translate-y-[180px] scale-[0.55] transition-all duration-[1800ms] pointer-events-none" style="filter: drop-shadow(0 0 30px rgba(255,255,255,0.25));" />
+
+      <!-- Diamond Burst -->
+      <div id="diamond" class="absolute z-20 text-6xl md:text-7xl opacity-0 scale-[0.1] -rotate-[30deg] transition-all duration-[1200ms] pointer-events-none" style="text-shadow: 0 0 30px #ffffff, 0 0 70px #f59e0b;">
+        💎
+      </div>
+
+      <!-- Winner Showcase Card -->
+      <div id="winner-card" class="absolute z-30 bottom-5 left-1/2 -translate-x-1/2 w-[min(420px,92vw)] p-4 md:p-5 rounded-3xl border border-neutral-600/80 text-center opacity-0 translate-y-[140%] transition-all duration-[1200ms]" style="background: linear-gradient(145deg, #181818, #070707); box-shadow: 0 20px 70px #000, 0 0 35px rgba(255,255,255,0.08);">
+        <div class="relative inline-block">
+          <img src="https://i.ibb.co/prnXzb0F/Fs-Z7-EXg-AAy-EW0.jpg" alt="Winner" class="w-16 h-16 rounded-full object-cover border-2 border-amber-400 mx-auto shadow-md" />
+          <span class="absolute -bottom-1 -right-1 text-base">👑</span>
+        </div>
+        <div class="text-xl font-black text-white mt-1.5">🐸 Shadow</div>
+        <div class="text-xs text-neutral-400 font-mono">@shadow_sigma</div>
+
+        <div class="inline-block my-2 px-3 py-1 rounded-full border border-amber-400/80 bg-amber-400/10 text-amber-300 font-black text-[11px] uppercase tracking-wider">
+          👑 SIGMA OF THE DAY
+        </div>
+
+        <div class="text-2xl font-black text-emerald-400 tracking-tight">
+          ⚡ 9,842 <span class="text-[10px] text-neutral-400 font-bold">SIGMA SCORE</span>
+        </div>
+
+        <div class="flex justify-around items-center mt-2.5 py-2 px-3 rounded-xl bg-neutral-900 border border-neutral-800 text-xs">
+          <span class="text-amber-300 font-bold">🔥 1,284<br><span class="text-[10px] text-neutral-400 font-normal">Sigma</span></span>
+          <span class="text-amber-300 font-bold">😂 642<br><span class="text-[10px] text-neutral-400 font-normal">Funny</span></span>
+          <span class="text-amber-300 font-bold">🧠 913<br><span class="text-[10px] text-neutral-400 font-normal">Smart</span></span>
+        </div>
+
+        <div class="mt-2.5 p-3 rounded-xl bg-neutral-950 border border-neutral-800 text-neutral-200 text-xs italic">
+          "I don't chase opportunities… opportunities chase me."
+        </div>
+
+        <button onclick="closeCeremony()" class="w-full mt-3 py-2 bg-gradient-to-r from-amber-400 to-amber-500 text-black font-black rounded-xl text-xs uppercase tracking-wider transition cursor-pointer">
+          Enter Arena Feed
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // State
+    const defaultAnswers = [
+      {
+        id: '1',
+        username: 'sigma_alpha',
+        name: 'Alpha Prime',
+        text: 'Let them talk. While they discuss the plan, I am already living the result.',
+        sigma: 242,
+        smart: 180,
+        funny: 45
+      },
+      {
+        id: '2',
+        username: 'shadow_sigma',
+        name: 'Shadow',
+        text: 'Silence is the best strategy. The lion never explains why he walks alone.',
+        sigma: 512,
+        smart: 320,
+        funny: 89
+      }
+    ];
+
+    let answers = JSON.parse(localStorage.getItem('sigma_standalone_answers') || 'null') || defaultAnswers;
+
+    function saveAnswers() {
+      localStorage.setItem('sigma_standalone_answers', JSON.stringify(answers));
+      renderAnswers();
+    }
+
+    function renderAnswers() {
+      const container = document.getElementById('answers-container');
+      container.innerHTML = answers.map(a => `
+        <div class="p-4 rounded-2xl bg-neutral-900 border border-neutral-800 space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-bold text-white">@${a.username}</span>
+            <span class="text-[10px] text-emerald-400 font-mono font-bold">
+              ${a.sigma * 3 + a.smart * 2 + a.funny} pts
+            </span>
+          </div>
+          <p class="text-xs text-neutral-200 leading-relaxed italic">"${a.text}"</p>
+          <div class="flex items-center gap-2 pt-1">
+            <button onclick="voteAnswer('${a.id}', 'sigma')" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs text-amber-300 font-bold transition">
+              🔥 ${a.sigma}
+            </button>
+            <button onclick="voteAnswer('${a.id}', 'smart')" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs text-sky-300 font-bold transition">
+              🧠 ${a.smart}
+            </button>
+            <button onclick="voteAnswer('${a.id}', 'funny')" class="px-2.5 py-1 rounded-lg bg-neutral-800 hover:bg-neutral-700 text-xs text-rose-300 font-bold transition">
+              😂 ${a.funny}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function voteAnswer(id, type) {
+      const item = answers.find(x => x.id === id);
+      if (item) {
+        item[type] = (item[type] || 0) + 1;
+        saveAnswers();
+      }
+    }
+
+    function submitAnswer() {
+      const input = document.getElementById('answer-input');
+      const val = input.value.trim();
+      if (!val) return;
+      answers.unshift({
+        id: Date.now().toString(),
+        username: 'you_sigma',
+        name: 'You',
+        text: val,
+        sigma: 1,
+        smart: 0,
+        funny: 0
+      });
+      input.value = '';
+      saveAnswers();
+    }
+
+    function boostFirstAnswer() {
+      if (answers.length > 0) {
+        answers[0].sigma += 100;
+        saveAnswers();
+        alert('⚡ Answer boosted with +100 Sigma votes!');
+      }
+    }
+
+    // Web Audio Synthesizer
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playTone(freq, delay, dur, type = 'sine') {
+      try {
+        initAudio();
+        const o = audioCtx.createOscillator();
+        const g = audioCtx.createGain();
+        o.type = type;
+        o.frequency.setValueAtTime(freq, audioCtx.currentTime + delay);
+        g.gain.setValueAtTime(0.001, audioCtx.currentTime + delay);
+        g.gain.linearRampToValueAtTime(0.18, audioCtx.currentTime + delay + 0.03);
+        g.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + delay + dur);
+        o.connect(g);
+        g.connect(audioCtx.destination);
+        o.start(audioCtx.currentTime + delay);
+        o.stop(audioCtx.currentTime + delay + dur + 0.05);
+      } catch(e) {}
+    }
+
+    // Ceremony Animations
+    let timeouts = [];
+    function openCeremony() {
+      document.getElementById('ceremony-modal').classList.remove('hidden');
+      playCeremonySequence();
+    }
+
+    function closeCeremony() {
+      document.getElementById('ceremony-modal').classList.add('hidden');
+      timeouts.forEach(clearTimeout);
+      timeouts = [];
+    }
+
+    function playCeremonySequence() {
+      timeouts.forEach(clearTimeout);
+      timeouts = [];
+
+      const doorL = document.getElementById('door-left');
+      const doorR = document.getElementById('door-right');
+      const glow = document.getElementById('portal-glow');
+      const demon = document.getElementById('demon-img');
+      const diamond = document.getElementById('diamond');
+      const card = document.getElementById('winner-card');
+
+      doorL.style.transform = 'none';
+      doorR.style.transform = 'none';
+      glow.classList.remove('opacity-90', 'scale-110');
+      glow.classList.add('opacity-0', 'scale-95');
+      demon.classList.remove('opacity-100', 'translate-y-[-40px]', 'scale-100');
+      demon.classList.add('opacity-0', 'translate-y-[180px]', 'scale-[0.55]');
+      diamond.classList.remove('opacity-100', 'scale-100', 'rotate-0');
+      diamond.classList.add('opacity-0', 'scale-[0.1]', '-rotate-[30deg]');
+      card.classList.remove('opacity-100', 'translate-y-0');
+      card.classList.add('opacity-0', 'translate-y-[140%]');
+
+      // Audio intro
+      playTone(110, 0, 3, 'sine');
+      playTone(146, 0.4, 2.5, 'sine');
+
+      // 1. Gate Opens
+      timeouts.push(setTimeout(() => {
+        doorL.style.transform = 'perspective(500px) rotateY(-105deg)';
+        doorR.style.transform = 'perspective(500px) rotateY(105deg)';
+        glow.classList.remove('opacity-0', 'scale-95');
+        glow.classList.add('opacity-90', 'scale-110');
+        playTone(70, 0, 1.2, 'sawtooth');
+      }, 450));
+
+      // 2. Demon Rises
+      timeouts.push(setTimeout(() => {
+        demon.classList.remove('opacity-0', 'translate-y-[180px]', 'scale-[0.55]');
+        demon.classList.add('opacity-100', 'translate-y-[-40px]', 'scale-100');
+        playTone(45, 0, 1.5, 'sawtooth');
+      }, 1050));
+
+      // 3. Diamond
+      timeouts.push(setTimeout(() => {
+        diamond.classList.remove('opacity-0', 'scale-[0.1]', '-rotate-[30deg]');
+        diamond.classList.add('opacity-100', 'scale-100', 'rotate-0');
+        playTone(523, 0, 0.4, 'sine');
+        playTone(784, 0.1, 0.5, 'sine');
+        playTone(1046, 0.2, 0.7, 'sine');
+      }, 2600));
+
+      // 4. Winner Card
+      timeouts.push(setTimeout(() => {
+        card.classList.remove('opacity-0', 'translate-y-[140%]');
+        card.classList.add('opacity-100', 'translate-y-0');
+        playTone(261, 0, 0.5, 'triangle');
+        playTone(329, 0.1, 0.5, 'triangle');
+        playTone(392, 0.2, 0.5, 'triangle');
+        playTone(523, 0.3, 0.8, 'triangle');
+      }, 3500));
+    }
+
+    let hasAutoTriggeredMidnight = false;
+    let forceMidnightMode = false;
+
+    function toggleForceMidnight() {
+      forceMidnightMode = !forceMidnightMode;
+      updateMidnightBanner();
+    }
+
+    function updateMidnightBanner() {
+      const banner = document.getElementById('midnight-banner-container');
+      if (!banner) return;
+
+      const now = new Date();
+      const currentHour = now.getHours();
+      const isMidnightNow = currentHour === 0;
+
+      // Calculate time until next 12:00 AM
+      const nextMidnight = new Date(now);
+      nextMidnight.setHours(24, 0, 0, 0);
+      const diffSec = Math.max(0, Math.floor((nextMidnight.getTime() - now.getTime()) / 1000));
+      const h = String(Math.floor(diffSec / 3600)).padStart(2, '0');
+      const m = String(Math.floor((diffSec % 3600) / 60)).padStart(2, '0');
+      const s = String(diffSec % 60).padStart(2, '0');
+
+      // Auto trigger ceremony at 12:00 AM
+      if (isMidnightNow && !hasAutoTriggeredMidnight) {
+        hasAutoTriggeredMidnight = true;
+        openCeremony();
+      }
+
+      if (isMidnightNow || forceMidnightMode) {
+        banner.innerHTML = `
+          <button onclick="openCeremony()" class="w-full p-3.5 rounded-2xl bg-gradient-to-r from-amber-500/20 via-neutral-900 to-amber-500/20 border border-amber-500/50 hover:border-amber-400 flex items-center justify-between gap-3 text-left transition shadow-lg cursor-pointer">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="p-2 rounded-xl bg-amber-400/10 text-amber-400 border border-amber-400/30 shrink-0">
+                🌙
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-400 text-black">
+                    🌙 MIDNIGHT RESULT
+                  </span>
+                </div>
+                <p class="text-xs font-bold text-white truncate mt-0.5">
+                  Winner: <span class="text-amber-300">@shadow_sigma</span>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-amber-400 text-black font-black text-xs uppercase tracking-wider shrink-0 shadow">
+              ✨ Watch
+            </div>
+          </button>
+        `;
+      } else {
+        banner.innerHTML = `
+          <div class="p-3.5 rounded-2xl bg-gradient-to-r from-neutral-900 via-neutral-950 to-neutral-900 border border-neutral-800 flex items-center justify-between gap-3 shadow-lg">
+            <div class="flex items-center gap-2.5 min-w-0">
+              <span class="p-2 rounded-xl bg-amber-400/10 text-amber-400 border border-amber-400/20 shrink-0">
+                ⏳
+              </span>
+              <div class="min-w-0">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-[9px] font-black uppercase px-2 py-0.5 rounded-full bg-neutral-800 text-amber-400 border border-amber-400/30">
+                    🌙 12:00 AM RESULT
+                  </span>
+                  <span class="text-[10px] text-neutral-400 font-semibold hidden sm:inline">
+                    ARENA ACTIVE
+                  </span>
+                </div>
+                <p class="text-xs font-semibold text-neutral-300 truncate mt-0.5">
+                  Winner announced in <span class="font-mono text-amber-300 font-bold">${h}:${m}:${s}</span>
+                </p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2 shrink-0">
+              <div class="px-2.5 py-1.5 rounded-xl bg-neutral-900 border border-neutral-800 text-amber-300 font-mono font-black text-xs">
+                ${h}:${m}:${s}
+              </div>
+              <button onclick="openCeremony()" class="px-2.5 py-1.5 rounded-xl bg-amber-400 hover:bg-amber-300 text-black font-black text-[11px] uppercase tracking-wider cursor-pointer">
+                Preview
+              </button>
+            </div>
+          </div>
+        `;
+      }
+    }
+
+    renderAnswers();
+    updateMidnightBanner();
+    setInterval(updateMidnightBanner, 1000);
+  </script>
+</body>
+</html>
